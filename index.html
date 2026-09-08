@@ -1,0 +1,155 @@
+<style>
+    /* 전체 컨테이너 스타일 */
+    .sql-guide-container {
+        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+        line-height: 1.6;
+        color: #334155;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #ffffff;
+    }
+
+    /* 메인 제목 */
+    .sql-guide-container h2 {
+        color: #0f172a;
+        font-size: 1.8rem;
+        border-bottom: 3px solid #3b82f6;
+        padding-bottom: 10px;
+        margin-bottom: 30px;
+    }
+
+    /* 소제목 */
+    .sql-guide-container h3 {
+        color: #1d4ed8;
+        font-size: 1.4rem;
+        margin-top: 40px;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* 설명 텍스트 */
+    .sql-guide-container p {
+        margin-bottom: 15px;
+        font-size: 1.05rem;
+    }
+
+    /* 하이라이트 박스 (예시용) */
+    .box-example {
+        background-color: #eff6ff;
+        border-left: 4px solid #3b82f6;
+        padding: 16px 20px;
+        border-radius: 0 8px 8px 0;
+        margin: 20px 0;
+    }
+
+    .box-example-title {
+        font-weight: 700;
+        color: #1e40af;
+        margin-bottom: 8px;
+    }
+
+    /* 하이라이트 박스 (핵심 요약용) */
+    .box-summary {
+        background-color: #f0fdf4;
+        border-left: 4px solid #22c55e;
+        padding: 16px 20px;
+        border-radius: 0 8px 8px 0;
+        margin: 20px 0;
+    }
+
+    .box-summary-title {
+        font-weight: 700;
+        color: #166534;
+        margin-bottom: 8px;
+    }
+
+    /* 코드 블록 스타일 */
+    .code-block {
+        background-color: #1e293b;
+        color: #e2e8f0;
+        padding: 20px;
+        border-radius: 10px;
+        font-family: 'Fira Code', Consolas, Monaco, monospace;
+        font-size: 0.95rem;
+        overflow-x: auto;
+        margin: 15px 0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 텍스트 강조 */
+    .highlight-text {
+        background-color: #fef08a;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+        color: #854d0e;
+    }
+</style>
+
+<div class="sql-guide-container">
+    <h2>SQL JOIN 완벽 정리: INNER, LEFT, 그리고 WHERE</h2>
+    <p>데이터베이스에서 두 개의 테이블을 연결할 때 사용하는 <strong>JOIN</strong>! 헷갈리기 쉬운 개념과 실습 예제를 깔끔하게 정리해 보았습니다.</p>
+
+    <!-- INNER JOIN Section -->
+    <h3>🤝 1. INNER JOIN (교집합)</h3>
+    <p><strong>JOIN</strong>은 서로 관련 있는 두 테이블을 이어 붙이는 기능입니다. 보통 한쪽의 PK(기본키)와 다른 쪽의 FK(외래키)를 기준으로 연결합니다.</p>
+
+    <div class="box-example">
+        <div class="box-example-title">💡 이해하기 쉬운 예시</div>
+        Table_A: id 1, 2, 3<br>
+        Table_B: a_id 1, 2, 4<br>
+        이때 두 테이블을 연결하면 <strong>둘 다 가지고 있는 값인 1, 2만</strong> 결과에 남습니다.
+    </div>
+
+    <div class="box-summary">
+        <div class="box-summary-title">📌 핵심 요약</div>
+        INNER JOIN = 두 테이블에서 <span class="highlight-text">서로 매칭되는 행만</span> 가져오는 것 (교집합)
+    </div>
+
+    <p><strong>💻 실습 1) 입원한 적 있는 환자의 정보만 조회하기</strong></p>
+    <div class="code-block">
+        SELECT *
+        FROM patients
+        INNER JOIN admissions ON patients.patient_id = admissions.patient_id;
+    </div>
+
+    <p><strong>💻 실습 2) 실제로 입원하고, 담당 의사가 배정된 환자의 정보 조회</strong></p>
+    <div class="code-block">
+        SELECT patients.last_name, admissions.diagnosis, doctors.specialty
+        FROM patients
+        INNER JOIN admissions ON patients.patient_id = admissions.patient_id
+        INNER JOIN doctors ON doctors.doctor_id = admissions.attending_doctor_id;
+    </div>
+
+    <!-- LEFT JOIN Section -->
+    <h3>👈 2. LEFT JOIN (기준은 왼쪽!)</h3>
+    <p><strong>LEFT JOIN</strong>은 왼쪽 테이블의 데이터는 무조건 다 가져오고, 오른쪽 테이블에 같은 값이 있으면 붙이고 없으면 비워 두는(NULL) 방식입니다.</p>
+
+    <div class="box-summary">
+        <div class="box-summary-title">📌 핵심 요약</div>
+        왼쪽(A)에 있는 행은 <span class="highlight-text">절대 사라지지 않음!</span><br>
+        오른쪽(B)은 맞는 데이터가 있을 때만 붙고, 없으면 <strong>NULL</strong>로 표시됨.
+    </div>
+
+    <p><strong>💻 실습 1) '모든 환자'의 입원 정보 조회 (입원 안 한 환자 포함)</strong></p>
+    <div class="code-block">
+        SELECT patients.patient_id, admissions.admission_date
+        FROM patients
+        LEFT JOIN admissions ON patients.patient_id = admissions.patient_id;
+    </div>
+
+    <!-- JOIN + WHERE Section -->
+    <h3>🔍 3. JOIN + WHERE (필터링 추가)</h3>
+    <p>먼저 JOIN으로 테이블을 연결한 다음, WHERE 조건절로 필터링하는 방식입니다. 연결 기준(ON)을 세운 후, 연결된 결과에서 필터링(WHERE)을 거친다고 생각하면 쉽습니다.</p>
+
+    <p><strong>💻 실습) 모든 환자의 정보 중 province_id = 'AB'인 환자만 조회</strong></p>
+    <div class="code-block">
+        SELECT patients.patient_id, province_names.province_name
+        FROM patients
+        LEFT JOIN province_names ON patients.province_id = province_names.province_id
+        WHERE patients.province_id = 'AB';
+    </div>
+</div>
